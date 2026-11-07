@@ -1,6 +1,6 @@
 # Agent handoff: Create: Airwaves revival
 
-Last updated: 2026-10-23. Status: **planning only. No code downloaded, built or written yet.**
+Last updated: 2026-11-07. Status: **the reconstruction's code is in the fork [liangforstudy/create-airwaves-1](https://github.com/liangforstudy/create-airwaves-1). Nothing built or changed yet.**
 
 ## The project
 Revive **Create: Airwaves**, a radio addon for the Create mod. Its authors deleted it about 2 days after release, after being called out for using AI to write it.
@@ -22,7 +22,8 @@ The user also wants new features, mainly **video broadcast to CRT TV screens**.
 ## Sources (GitHub)
 | Repo | What it is |
 |---|---|
-| [vigasilva/Create-Airwaves](https://github.com/vigasilva/Create-Airwaves) | **Chosen base.** A reconstruction of 0.1.1 made with AI (Codex) by a community member, not the original author. It uses a normal Gradle layout, and dependencies download from public Maven repos. Branch `master`. |
+| [liangforstudy/create-airwaves-1](https://github.com/liangforstudy/create-airwaves-1) | **The user's fork, where all work happens.** Forked from vigasilva/Create-Airwaves, so its history and credit are kept. These docs live here in `doc/`. |
+| [vigasilva/Create-Airwaves](https://github.com/vigasilva/Create-Airwaves) | **Chosen base** (upstream of the fork). A reconstruction of 0.1.1 made with AI (Codex) by a community member, not the original author. It uses a normal Gradle layout, and dependencies download from public Maven repos. Branch `master`. |
 | [TheStuffThatIsUnknown/Create-Airwaves-Decompiled](https://github.com/TheStuffThatIsUnknown/Create-Airwaves-Decompiled) | Raw 0.1.0 decompile (`.class` files plus assets). Reference only. Branch `0.1.0`. |
 | [DJP728/Create-Airwaves-Archive](https://github.com/DJP728/Create-Airwaves-Archive) | Original `airwaves-1.21.1-0.1.1-atm10.jar`. |
 
@@ -51,14 +52,14 @@ The user also wants new features, mainly **video broadcast to CRT TV screens**.
 - **Aeronautics/Sable:** Sable support is already kept separate in `compat/SableCompat`, so making both optional should be feasible.
 
 ## Decisions made
-- Base: fork **vigasilva/Create-Airwaves**.
+- Base: **vigasilva/Create-Airwaves**, forked as **liangforstudy/create-airwaves-1** (done).
 - **Mod ID stays `airwaves`**, so worlds made with the original still load.
-- Fork and publish on GitHub **later**, not now.
+- The fork exists on GitHub. Publishing a release (e.g. on Modrinth/CurseForge) comes **later**, not now.
 - Display name is open. The user leans toward "Airwaves" + Extended / Enhanced / TV Edition.
 
 ## Phase plan
 - **Phase 0: get it running.**
-  - Download the reconstruction into this folder, then build it.
+  - Build the code that's already in the fork.
   - Launch a dev client.
   - Check the main features: tape player → transmitter → radio/speaker, cables, Ponder.
   - Expect some bugs, since the reconstruction is AI-made from decompiled code.
@@ -80,8 +81,9 @@ See [phase-2-video-plan.md](phase-2-video-plan.md):
 5. Camera rendering on a player's client.
 6. Mod name.
 
-## need to scan pc Environment for the required tooling first
-(ask java, prism launcher, unless already stated in claude code claude.md)
+## PC setup still to check
+- Prism Launcher: already installed (instances in `D:\PrismLauncher\instances`).
+- Java 21: not confirmed yet. Ask the user.
 
 ## Next step
 Waiting for the user's go-ahead to start **Phase 0**.
