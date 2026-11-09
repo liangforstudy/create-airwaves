@@ -40,7 +40,8 @@ Fixes made (2026-11-09, on the user's PC, Windows, Java 21):
   - the Airwaves jar from step 2
 - Optional extras: JEI, Simple Voice Chat, Create: Power Grid.
 
-Never mind the manual play-test: **Numen** (CurseForge, Fabric + NeoForge, 1.21.1) is the mod that hooks an LLM up to this version of Minecraft. It spawns a real server-side player companion and, since 0.0.6, runs a built-in MCP server, so an external agent (Claude Code, Claude Desktop, Codex, Cursor) is the brain and the companion is the hands. That is how an LLM can drive this build instead of the user clicking through it.
+#### The play-test where an llm drives the game: 
+**Numen** (CurseForge, Fabric + NeoForge, 1.21.1) is the mod that hooks an LLM up to this version of Minecraft. It spawns a real server-side player companion and, since 0.0.6, runs a built-in MCP server, so an external agent (Claude Code, Claude Desktop, Codex, Cursor) is the brain and the companion is the hands.
 - Needs the Numen jar only; the external-brain mode uses the agent's own subscription, no separate API key.
 - Enable the MCP server on Numen's settings page, summon a companion, then register the endpoint (default [censored] plus its token) in the agent.
 - Claude Code 2.1.317 is on this PC at [censored]; it supports HTTP MCP: `claude mcp add --transport http numen <url> --header "Authorization: Bearer <token>"`.
