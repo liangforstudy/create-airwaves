@@ -1,8 +1,8 @@
 # Phase 0 — Get it running
 
-Status: **plan, waiting for the user's go-ahead.** Step 1 is done (the code is in the fork). Nothing built yet.
+Status: **step 2 done (builds), step 3 done (dev server loads). Waiting on the play-test in step 5.**
 
-Goal: get the reconstructed mod (the fork [liangforstudy/create-airwaves-1](https://github.com/liangforstudy/create-airwaves-1), branch `master`, forked from [vigasilva/Create-Airwaves](https://github.com/vigasilva/Create-Airwaves)) to build, and confirm the main features work in a game. No new features and no cleanup in this phase. That's Phase 1.
+Goal: get the reconstructed mod (the fork [liangforstudy/create-airwaves](https://github.com/liangforstudy/create-airwaves), branch `master`, forked from [vigasilva/Create-Airwaves](https://github.com/vigasilva/Create-Airwaves)) to build, and confirm the main features work in a game. No new features and no cleanup in this phase. That's Phase 1.
 
 ## Who does what
 - **Claude (in the cloud):** downloads the code, builds it and fixes build errors. Can't open Minecraft.
@@ -11,18 +11,24 @@ Goal: get the reconstructed mod (the fork [liangforstudy/create-airwaves-1](http
 ## Steps
 
 ### 1. Bring in the code ✅ done
-- The user forked vigasilva/Create-Airwaves as liangforstudy/create-airwaves-1, so the code and its history are already here.
+- The user forked vigasilva/Create-Airwaves as liangforstudy/create-airwaves, so the code and its history are already here.
 - The existing README already says it's unofficial and keeps CC BY-NC-SA 4.0. A note about this revival and the full credits come in Phase 1.
 
-### 2. Build it (Claude)
+### 2. Build it (Claude) ✅ done
 - The cloud machine already has Java 21.
 - Run `./gradlew build`. The first run downloads Minecraft, NeoForge, Create and the other parts it needs, which takes a while.
 - If it fails, fix only what stops the build, and note each fix.
 - Result: a mod file in `build/libs/`, e.g. `airwaves-1.21.1-0.1.1.jar`.
 
-### 3. Quick automatic check (Claude, optional)
-- Try starting a headless test server (`./gradlew runServer`) to see whether the mod loads without crashing.
-- This needs Create, Aeronautics and Sable to be present. If that's awkward in the cloud, skip it and rely on step 5.
+Fixes made (2026-11-09, on the user's PC, Windows, Java 21):
+- `gradle.properties`: removed `org.gradle.java.home=/usr/lib/jvm/java-21-openjdk` (a Linux path that breaks any non-Linux machine); it is now a commented-out example.
+- `data/airwaves/recipe/tape.json`: output count 2 → 1. The tape item is `stacksTo(1)`, so the recipe failed to load with "stack size of 2 was larger than maximum: 1".
+- `build.gradle` dependencies: Power Grid `0.6.1` → the NeoForge 1.21.1 build of `0.6.2` (pinned by Modrinth version id `jCkPHjmP`; the version *number* resolves to the 1.20.1 Forge jar, which NeoForge refuses to load). Power Grid 0.6.2 needs Sable 2.0.3+ and Architectury; so Sable `2.0.1` → `2.0.6`, and `architectury-api:13.0.11+neoforge` added.
+
+### 3. Quick automatic check (Claude, optional) ✅ done
+- `./gradlew runServer` on this PC loads all mods and reaches "Done (1.6s)" with no mod-loading issues and no recipe errors.
+- Power Grid's optional native solver prints a harmless `UnsatisfiedLinkError`; it falls back to the Java solver.
+- The mod reports version `0.0NONE` in a dev run only, because `neoforge.mods.toml` uses `${file.jarVersion}` and a dev run has no jar. The built jar is fine.
 
 ### 4. Set up your PC (you, with simple steps from Claude)
 - Install Java 21, if you don't already have it. (Prism Launcher is already installed.)

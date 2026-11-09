@@ -2,7 +2,7 @@
 
 Status: **draft, not started.** Phases 0 (get the reconstruction building) and 1 (cleanup, optional dependencies, rename) come first.
 
-Base: [liangforstudy/create-airwaves-1](https://github.com/liangforstudy/create-airwaves-1), a fork of [vigasilva/Create-Airwaves](https://github.com/vigasilva/Create-Airwaves) (reconstructed 0.1.1, NeoForge 1.21.1, Create 6.0.x).
+Base: [liangforstudy/create-airwaves](https://github.com/liangforstudy/create-airwaves), a fork of [vigasilva/Create-Airwaves](https://github.com/vigasilva/Create-Airwaves) (reconstructed 0.1.1, NeoForge 1.21.1, Create 6.0.x).
 License: CC BY-NC-SA 4.0, inherited from the original. Credit the original authors, no commercial use, same license for derivatives.
 
 ## Goal
@@ -54,5 +54,5 @@ Send video over the existing Airwaves radio network and show it on CRT TV blocks
 6. **Mod name:** candidates are "Create: Airwaves Enhanced", "Create: Airwaves Extended" and "Create: Airwaves TV Edition".
 ## Decided so far
 - Mod ID stays `airwaves`, so worlds made with the original mod still load.
-- Forked on GitHub as liangforstudy/create-airwaves-1. Publishing a release comes later, not now.
+- Forked on GitHub as liangforstudy/create-airwaves. Publishing a release comes later, not now.
 - Testing note: this PC has no built-in microphone. A USB mic will be added later. Until then, test audio with the tape player and with a second player or client.

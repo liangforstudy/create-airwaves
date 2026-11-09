@@ -54,8 +54,12 @@ dependencies {
 
     // Compatibility APIs. These are fetched automatically for a clean clone;
     // none are shaded or redistributed in the produced Airwaves JAR.
-    implementation('maven.modrinth:sable:2.0.1+mc1.21.1')
-    implementation('maven.modrinth:power-grid:0.6.1')
+    implementation('maven.modrinth:sable:2.0.6+mc1.21.1')
+    // Pinned to the Modrinth version id: the 0.6.2 version number also names
+    // the 1.20.1 Forge build, which Modrinth's Maven resolves instead.
+    implementation('maven.modrinth:power-grid:jCkPHjmP')
+    // Power Grid 0.6.2's own mandatory dependency.
+    implementation('maven.modrinth:architectury-api:13.0.11+neoforge')
     implementation('maven.modrinth:create-electro-energetics:1.21.1-1.1.1')
     implementation('maven.modrinth:simple-voice-chat:neoforge-1.21.1-2.6.21')
     implementation('mezz.jei:jei-1.21.1-neoforge:19.53.0.425')
