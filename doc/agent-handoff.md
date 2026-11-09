@@ -85,5 +85,11 @@ See [phase-2-video-plan.md](phase-2-video-plan.md):
 - Prism Launcher: already installed (instances in `D:\PrismLauncher\instances`).
 - Java 21: confirmed (`D:\Downloads\jdk-21.0.2`; Gradle also has a Temurin 21 under `~/.gradle/jdks`). `java` on PATH is still 17, so builds need `JAVA_HOME` pointed at a 21 JDK.
 
+## Running it on this PC
+- Build: set `JAVA_HOME=D:\Downloads\jdk-21.0.2` first (`java` on PATH is 17), then `gradlew.bat build`. Output: `build/libs/create-airwaves-reconstructed-0.1.1-reconstructed.0.jar`.
+- Dev client: `gradlew.bat runClient`. It is at the main menu once `run\client.log` contains **"Sound engine started"**.
+- Dev server: `gradlew.bat runServer`, then `stop` in its console.
+- A dev run reports the mod version as `0.0NONE` (no jar manifest); the built jar shows the real version.
+
 ## Next step
-Play-test the built jar on the PC (Phase 0 step 5 checklist in [phase-0-plan.md](phase-0-plan.md)).
+Finish the Phase 0 checklist ([phase-0-plan.md](phase-0-plan.md) step 5). Preferred route: **Numen** — it hooks an LLM to 1.21.1 via a built-in MCP server, so the agent drives a real server-side player companion. Claude Code 2.1.317 is installed on this PC (`C:\Users\liang\AppData\Local\Claude-Data\claude_pzs8sxrjxfjjc\claude-code\2.1.317\a33aa5518497\claude.exe`, not on PATH). Needs the Numen jar downloaded from CurseForge. Fallback: the user plays through the checklist by hand.

@@ -1,6 +1,6 @@
 # Phase 0 — Get it running
 
-Status: **step 2 done (builds), step 3 done (dev server loads). Waiting on the play-test in step 5.**
+Status: **steps 1–4 done. The dev client runs; the field manual, Ponder and creative tabs were checked on 2026-11-09. Next: drive the remaining checklist with an LLM via Numen (step 4) or by hand.**
 
 Goal: get the reconstructed mod (the fork [liangforstudy/create-airwaves](https://github.com/liangforstudy/create-airwaves), branch `master`, forked from [vigasilva/Create-Airwaves](https://github.com/vigasilva/Create-Airwaves)) to build, and confirm the main features work in a game. No new features and no cleanup in this phase. That's Phase 1.
 
@@ -30,7 +30,7 @@ Fixes made (2026-11-09, on the user's PC, Windows, Java 21):
 - Power Grid's optional native solver prints a harmless `UnsatisfiedLinkError`; it falls back to the Java solver.
 - The mod reports version `0.0NONE` in a dev run only, because `neoforge.mods.toml` uses `${file.jarVersion}` and a dev run has no jar. The built jar is fine.
 
-### 4. Set up your PC (you, with simple steps from Claude)
+### 4. Set up your PC (you, with simple steps from Claude) ✅ done for the dev run
 - Install Java 21, if you don't already have it. (Prism Launcher is already installed.)
 - Make a Minecraft 1.21.1 NeoForge instance in Prism.
 - Add the mods to it:
@@ -40,16 +40,22 @@ Fixes made (2026-11-09, on the user's PC, Windows, Java 21):
   - the Airwaves jar from step 2
 - Optional extras: JEI, Simple Voice Chat, Create: Power Grid.
 
+Never mind the manual play-test: **Numen** (CurseForge, Fabric + NeoForge, 1.21.1) is the mod that hooks an LLM up to this version of Minecraft. It spawns a real server-side player companion and, since 0.0.6, runs a built-in MCP server, so an external agent (Claude Code, Claude Desktop, Codex, Cursor) is the brain and the companion is the hands. That is how an LLM can drive this build instead of the user clicking through it.
+- Needs the Numen jar only; the external-brain mode uses the agent's own subscription, no separate API key.
+- Enable the MCP server on Numen's settings page, summon a companion, then register the endpoint (default [censored] plus its token) in the agent.
+- Claude Code 2.1.317 is on this PC at [censored]; it supports HTTP MCP: `claude mcp add --transport http numen <url> --header "Authorization: Bearer <token>"`.
+- Caveats: the endpoint only listens while the game runs, and the companion's tools are generic (move, dig, place, interact), so Create-specific GUIs such as the tape player slots may need a plugin or still be done by hand.
+
 ### 5. Play-test checklist (you)
 Use a creative test world. No microphone is needed for this.
-- [ ] The game starts, and the Airwaves items show in the creative tab or JEI.
+- [x] The game starts, and the Airwaves items show in the creative tab or JEI.
+- [x] The field manual opens (checked with the dev client on 2026-11-09; it shows `v0.0NONE`, expected in a dev run).
+- [x] Ponder scenes open.
 - [ ] Tape player → cable → transmitter → radio on the same frequency: you hear the tape.
 - [ ] Moving the radio farther away adds more static.
 - [ ] A radio on a different frequency stays silent.
 - [ ] Relay and jammer behave sensibly.
 - [ ] Circuit workbench opens, and crafting recipes appear.
-- [ ] Ponder scenes open (hold W over an item).
-- [ ] The field manual opens.
 - [ ] Optional: a second client hears the transmission.
 - [ ] Optional: an old world from the original mod still loads.
 
