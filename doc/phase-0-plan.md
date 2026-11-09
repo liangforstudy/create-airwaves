@@ -160,7 +160,26 @@ Done as the player through s00d's screen tools; screenshots are in `run/screensh
 - **All 51 recipe files load.** The game log shows no recipe errors (3,239 recipes loaded in total). Each Airwaves recipe ID was checked with `/recipe give`: the 40 vanilla-type ones (36 crafting, 2 smelting, 2 blasting) unlock; the 11 Create-machine ones (6 mechanical crafting, 2 sequenced assembly, 2 crushing, 1 pressing) answer "No new recipes were learned", which means they exist but are hidden from the recipe book (a missing ID answers "Unknown recipe").
 - **No ingredient is missing.** A recipe with an unknown item would not load, and none failed. The 10 tags the recipes use all contain their expected item (checked with `/execute if items`): `c:ingots/silver`, `c:nuggets/silver`, `c:ores/silver` (both ores), `c:plates/silver`, `c:nuggets/copper`, `c:nuggets/zinc`, `c:plates/brass`, `c:plates/copper`, `c:plates/iron` (Create sheets), `minecraft:planks`.
 - **Every one of the 62 Airwaves items can be obtained.** 45 come from a recipe. The other 17: 10 circuit boards come from the circuit workbench blueprints; 3 creative blocks are creative-only; 2 `incomplete_*` items are sequenced-assembly in-between items; and silver ore and deepslate silver ore come from world generation, confirmed in the world (491 blocks within 32 blocks of the bench, y −40 to 5).
-- Not done: actually crafting each recipe. The Create-machine recipes (pressing the silver sheet, crushing silver ore, the circuit board and signal mechanism sequenced assemblies, mechanical crafting of the towers, transmitter and receiver) were only checked as loaded, not run on machines.
+##### Create-machine recipes, run on real machines
+Built on a pad at x 48–60, z −12 to 0, all driven by creative motors at 16 RPM; items put in as the player or through a hopper.
+
+| Recipe | Machine | Result |
+|---|---|---|
+| `pressing_silver_sheet` | Mechanical press over a depot | Pass: silver ingot → silver sheet. |
+| `crushing_silver_ore`, `crushing_deepslate_silver_ore` | Pair of crushing wheels | **Fail**, see below: the output is `create:crushed_raw_silver`, not `airwaves:raw_silver`. |
+| `assembly_circuit_board` | Deployer over a depot (fed by a hopper), then the press | Pass: smooth stone slab → wire → silver nugget → quartz → press, 25/50/75/100%, **2 circuit boards**. |
+| `assembly_signal_mechanism` | Deployer over a depot | Pass: precision mechanism → crystal oscillator → electron tube → silver sheet → signal mechanism. |
+| `receiver`, `transmitter`, `dimensional_relay`, `relay_tower_small`, `relay_tower_big`, `radio_tower` | 5×5 wall of mechanical crafters, started with a redstone pulse | Pass: each came out on the output depot, all crafters emptied. |
+
+**Bug: crushing Airwaves silver is a dead end with Airwaves alone.** Airwaves puts its ores in `c:ores/silver` and raw silver in `c:raw_materials/silver`. Create ships its own `create:crushing/silver_ore` and `create:crushing/raw_silver` recipes for those tags, and they win over Airwaves' `crushing_*_silver_ore`. Silver ore, deepslate silver ore and raw silver all crush into `create:crushed_raw_silver` (+ experience nuggets). Create only processes crushed raw silver further when another silver mod is installed (its washing recipes are conditional on Galosphere, Immersive Engineering, Oreganized, Thermal, or Ice and Fire), so with Airwaves alone the player gets an item nothing uses. Upstream's metadata and the field manual don't recommend a silver mod. Possible fixes for Phase 1:
+- add Airwaves recipes for `create:crushed_raw_silver`: washing → 9 Airwaves silver nuggets, and smelting/blasting → a silver ingot (the same treatment Create gives its own metals); or
+- override Create's two silver crushing recipes with the Airwaves outputs (fragile: it overrides another mod's data).
+
+Notes for running Create machines from an agent:
+- Mechanical crafters take no shaft; they behave like cogwheels and are driven by a cogwheel beside the grid.
+- A deployer didn't accept an item from a right-click here; a hopper on its back works.
+- `/data merge` on any Create kinetic block (motor, transmitter) detaches it from its network; set motor speed by scrolling on it in game instead.
+- An open screen on the client (Ponder, JEI) swallows the agent's clicks: the first dimensional-relay attempt failed this way and passed on a clean retry.
 
 Still open: voice through a real microphone (needs you and a headset), the optional second client, and the optional old world.
 
