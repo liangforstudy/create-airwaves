@@ -156,6 +156,12 @@ Done as the player through s00d's screen tools; screenshots are in `run/screensh
 - Blank circuit board in its slot, Radio blueprint, Auto: it laid out the 8 parts (coil, 2 capacitors, crystal oscillator, LED, transistor, 2 resistors) and the copper traces, listed the stages (tuned tank, oscillator, transistor amp, indicator) and said "Ready: take your Radio Board". Taking it used up the board and the parts and gave one Radio Board. Pass.
 - 36 Airwaves crafting recipes are in the client's recipe book; no errors in the client log. Pass.
 
+##### Recipe audit
+- **All 51 recipe files load.** The game log shows no recipe errors (3,239 recipes loaded in total). Each Airwaves recipe ID was checked with `/recipe give`: the 40 vanilla-type ones (36 crafting, 2 smelting, 2 blasting) unlock; the 11 Create-machine ones (6 mechanical crafting, 2 sequenced assembly, 2 crushing, 1 pressing) answer "No new recipes were learned", which means they exist but are hidden from the recipe book (a missing ID answers "Unknown recipe").
+- **No ingredient is missing.** A recipe with an unknown item would not load, and none failed. The 10 tags the recipes use all contain their expected item (checked with `/execute if items`): `c:ingots/silver`, `c:nuggets/silver`, `c:ores/silver` (both ores), `c:plates/silver`, `c:nuggets/copper`, `c:nuggets/zinc`, `c:plates/brass`, `c:plates/copper`, `c:plates/iron` (Create sheets), `minecraft:planks`.
+- **Every one of the 62 Airwaves items can be obtained.** 45 come from a recipe. The other 17: 10 circuit boards come from the circuit workbench blueprints; 3 creative blocks are creative-only; 2 `incomplete_*` items are sequenced-assembly in-between items; and silver ore and deepslate silver ore come from world generation, confirmed in the world (491 blocks within 32 blocks of the bench, y −40 to 5).
+- Not done: actually crafting each recipe. The Create-machine recipes (pressing the silver sheet, crushing silver ore, the circuit board and signal mechanism sequenced assemblies, mechanical crafting of the towers, transmitter and receiver) were only checked as loaded, not run on machines.
+
 Still open: voice through a real microphone (needs you and a headset), the optional second client, and the optional old world.
 
 #### Results so far (2026-11-09, dev client, LAN world in creative)
