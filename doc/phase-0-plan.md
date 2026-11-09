@@ -15,7 +15,7 @@ Goal: get the reconstructed mod (the fork [liangforstudy/create-airwaves](https:
 - The existing README already says it's unofficial and keeps CC BY-NC-SA 4.0. A note about this revival and the full credits come in Phase 1.
 
 ### 2. Build it (Claude) ✅ done
-- The cloud machine already has Java 21.
+- The 1050 already has Java 21.
 - Run `./gradlew build`. The first run downloads Minecraft, NeoForge, Create and the other parts it needs, which takes a while.
 - If it fails, fix only what stops the build, and note each fix.
 - Result: a mod file in `build/libs/`, e.g. `airwaves-1.21.1-0.1.1.jar`.
