@@ -1,6 +1,6 @@
 # Phase 0 — Get it running
 
-Status: **steps 1–4 done. The dev client runs; the field manual, Ponder and creative tabs were checked on 2026-11-09. Next: drive the remaining checklist with an LLM via Numen (step 4) or by hand.**
+Status: **steps 1–4 done. The dev client runs; the field manual, Ponder and creative tabs were checked on 2026-11-09. Numen 0.1.2 is wired into the dev run and opencode drives a companion in game, and it built a test bench near spawn. Next: the audio half of the checklist (step 5), by ear.**
 
 Goal: get the reconstructed mod (the fork [liangforstudy/create-airwaves](https://github.com/liangforstudy/create-airwaves), branch `master`, forked from [vigasilva/Create-Airwaves](https://github.com/vigasilva/Create-Airwaves)) to build, and confirm the main features work in a game. No new features and no cleanup in this phase. That's Phase 1.
 
@@ -43,9 +43,16 @@ Fixes made (2026-11-09, on the user's PC, Windows, Java 21):
 #### The play-test where an llm drives the game: 
 **Numen** (CurseForge, Fabric + NeoForge, 1.21.1) is the mod that hooks an LLM up to this version of Minecraft. It spawns a real server-side player companion and, since 0.0.6, runs a built-in MCP server, so an external agent (Claude Code, Claude Desktop, Codex, Cursor) is the brain and the companion is the hands.
 - Needs the Numen jar only; the external-brain mode uses the agent's own subscription, no separate API key.
-- Enable the MCP server on Numen's settings page, summon a companion, then register the endpoint (default [censored] plus its token) in the agent.
-- Claude Code 2.1.317 is on this PC at [censored]; it supports HTTP MCP: `claude mcp add --transport http numen <url> --header "Authorization: Bearer <token>"`.
-- Caveats: the endpoint only listens while the game runs, and the companion's tools are generic (move, dig, place, interact), so Create-specific GUIs such as the tape player slots may need a plugin or still be done by hand.
+- Claude Code 2.1.317 is on this PC at [censored]; it supports HTTP MCP. It was not used in the end: opencode drives the companion.
+
+How it is actually wired (2026-11-09):
+- The jar (`numen-neoforge-1.21.1-0.1.2.jar`, CurseForge file 8735972) sits in `libs/`, which is gitignored, and `build.gradle` adds it as `runtimeOnly files(...)` so it loads in `runClient`/`runServer` only. It is not part of the built jar.
+- The MCP server reads `run/config/numen/mcp_server.json` at start-up, so it can be configured before launch: `enabled`, `host` (default `127.0.0.1`), `port` (default `8765`), `token`, `call_timeout_seconds` (default 300), `hidden_tools`, `quiet_fallback`. No in-game clicks are needed — the settings page only rewrites this file.
+- Endpoint: `http://127.0.0.1:8765/mcp`, header `Authorization: Bearer <token>`, JSON-RPC 2025-06-18, POST only (a GET returns 405). Unauthenticated calls get 401.
+- Agent side: opencode's `mcp.numen` entry, `type: remote`, `oauth: false`, `timeout: 120000` (its 5 s default is too short for some calls).
+- Order matters: the server only listens while the game runs, so start the game first and opencode second. If opencode starts first it shows `server unavailable` and needs a restart.
+- The token is in `run/config/numen/mcp_server.json` and in the agent config; it is deliberately not copied into this doc.
+- `create_companion` works over MCP, but only once a world is loaded (a main-menu session answers `initialize` and `tools/list`, then refuses to summon).
 
 ### 5. Play-test checklist (you)
 Use a creative test world. No microphone is needed for this.
@@ -61,6 +68,21 @@ Use a creative test world. No microphone is needed for this.
 - [ ] Optional: an old world from the original mod still loads.
 
 For anything broken, a sentence or a screenshot is enough. The game log helps if there's a crash.
+
+#### Results so far (2026-11-09, dev client, LAN world in creative)
+- The companion "Airwave" was summoned through Numen and driven from opencode. It cannot type commands, so the world was switched to creative by hand.
+- It built a test bench just east of spawn (around x 31–33, y 68, z −9 to −6): two antennas on copper towers, a transmitter, a tuning table and a radio. The bench looks right on screen, and the companion reached the tuning table (`goto airwaves:tuning_table` in the log).
+- Not confirmed: opencode's wrap-up says the transmitter and tuning table work, but nothing in the log shows a signal or tuned frequency, and no one has listened yet. Treat the checklist items above as still open.
+- A later `goto airwaves:creative_transmitter` failed with `NO_PATH` (none in the loaded area), so the bench may use the regular transmitter rather than the creative one.
+- The audio items (tape, static over distance, other frequency, relay and jammer) need someone to listen. The companion's tools can't hear sound or fill the tape player slots, so these are by hand.
+- opencode ran out of its free model quota partway through, and its todo list is out of date; this section replaces it.
+
+Seen in the log, none blocking:
+- Opening to LAN: voice chat failed to bind UDP 53633 (`Address already in use`) and the voice server came up on 53606 instead.
+- `powergridNative7` native library not found, so PowerGrid falls back to its non-accelerated solver.
+- Electroenergetics' JEI plugin throws `NoClassDefFoundError` (JEI version mismatch) and is missing the `duplex_wire_segment` model; Veil fails to compile one compute shader. All come from dependencies, not Airwaves.
+
+Later, not Phase 0: the companion suggested performance mods for 1.21.1 NeoForge (Embeddium or Sodium, FerriteCore, ModernFix, EntityCulling, ImmediatelyFast, Dynamic FPS; Canary and Spark to measure). Untested with Airwaves.
 
 ### 6. Fix and repeat (Claude)
 - Fix the bugs you find, rebuild, and send a new jar. Repeat until the checklist passes or what's left is minor.

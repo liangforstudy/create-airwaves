@@ -5,3 +5,6 @@ libs/*.jar
 *.iml
 .idea/
 .vscode/
+
+# Local game logs (contain personal paths)
+*.log
