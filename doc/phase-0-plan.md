@@ -1,6 +1,6 @@
 # Phase 0 — Get it running
 
-Status: **steps 1–4 done. The dev client runs; the field manual, Ponder and creative tabs were checked on 2026-11-09. Numen 0.1.2 is wired into the dev run and opencode drives a companion in game, and it built a test bench near spawn. Next: the audio half of the checklist (step 5), by ear.**
+Status: **steps 1–4 done. The dev client runs; the field manual, Ponder and creative tabs were checked on 2026-11-09. A Numen companion driven by opencode built a test bench near spawn; the dev run now uses s00d/minecraft-mcp instead of Numen. Next: the audio half of the checklist (step 5), by ear.**
 
 Goal: get the reconstructed mod (the fork [liangforstudy/create-airwaves](https://github.com/liangforstudy/create-airwaves), branch `master`, forked from [vigasilva/Create-Airwaves](https://github.com/vigasilva/Create-Airwaves)) to build, and confirm the main features work in a game. No new features and no cleanup in this phase. That's Phase 1.
 
@@ -41,6 +41,15 @@ Fixes made (2026-11-09, on the user's PC, Windows, Java 21):
 - Optional extras: JEI, Simple Voice Chat, Create: Power Grid.
 
 #### The play-test where an llm drives the game: 
+**Now: s00d/minecraft-mcp** (replaced Numen on 2026-11-09, because Numen's companion can't click screen buttons or hear anything, and most of the checklist needs both).
+- [s00d/minecraft-mcp](https://github.com/s00d/minecraft-mcp) 0.6.0, NeoForge 1.21.1 jar from its GitHub release, in `libs/` (gitignored) and added to `build.gradle` as `runtimeOnly files(...)`.
+- It runs inside the client and the agent plays as you, not as a companion. 129 tools, including `screen.widget.click`, `sound.events` (what played, where, subtitle), `screenshot.take` and `command.run`.
+- Endpoint: `http://127.0.0.1:25580/mcp`, no token by default (loopback only, web pages refused). Config: `run/config/minecraft-mcp.toml`.
+- Registered as `minecraft` in Claude Code (local scope for this project) and in opencode's `opencode.json`. Start the game first, then the agent.
+- Also in the dev client, test-only: FerriteCore, ModernFix, Spark, ImmediatelyFast, EntityCulling. Not Dynamic FPS: it throttles the game while unfocused, which is exactly when an agent drives it.
+
+**Before (Numen, no longer loaded):** the notes below are kept for reference. The jar is still in `libs/` and opencode's `numen` entry is disabled, not deleted.
+
 **Numen** (CurseForge, Fabric + NeoForge, 1.21.1) is the mod that hooks an LLM up to this version of Minecraft. It spawns a real server-side player companion and, since 0.0.6, runs a built-in MCP server, so an external agent (Claude Code, Claude Desktop, Codex, Cursor) is the brain and the companion is the hands.
 - Needs the Numen jar only; the external-brain mode uses the agent's own subscription, no separate API key.
 - Claude Code 2.1.317 is on this PC at [censored]; it supports HTTP MCP. It was not used in the end: opencode drives the companion.
@@ -59,15 +68,95 @@ Use a creative test world. No microphone is needed for this.
 - [x] The game starts, and the Airwaves items show in the creative tab or JEI.
 - [x] The field manual opens (checked with the dev client on 2026-11-09; it shows `v0.0NONE`, expected in a dev run).
 - [x] Ponder scenes open.
-- [ ] Tape player → cable → transmitter → radio on the same frequency: you hear the tape.
-- [ ] Moving the radio farther away adds more static.
-- [ ] A radio on a different frequency stays silent.
-- [ ] Relay and jammer behave sensibly.
-- [ ] Circuit workbench opens, and crafting recipes appear.
+- [x] Tape player → cable → transmitter → radio on the same frequency: you hear the tape. (Creative transmitter and receiver; see "Session 2" below.)
+- [x] Moving the radio farther away adds more static. (Measured as receiver signal quality, not by ear; see "Static over distance" below.)
+- [x] A radio on a different frequency stays silent.
+- [x] Relay and jammer behave sensibly. (Measured as receiver signal quality; see "Jammer" and "Relay tower" below.)
+- [x] Circuit workbench opens, and crafting recipes appear. (Built a Radio Board with Auto; see "Screens" below.)
 - [ ] Optional: a second client hears the transmission.
 - [ ] Optional: an old world from the original mod still loads.
 
 For anything broken, a sentence or a screenshot is enough. The game log helps if there's a crash.
+
+#### Session 2 (2026-11-09, Claude Code over s00d/minecraft-mcp, same world)
+Evidence is from the server's block data (`/data get block`) and the client's `sound.events` list, which gives each sound's id and position, so "the receiver played it" means a sound at the receiver's coordinates.
+
+The bench opencode left: creative transmitter at (31, 68, −6) and creative receiver at (33, 68, −9), both with creative antennas, both on 98.1 FM; speaker (34, 68, −9); microphone (33, 68, −3); three tuning tables. Opencode's wires never connected (`links: []` on the mic and speaker). Added: a jukebox at (31, 68, −4) and a tape player at (32, 68, −4).
+
+| Test | Result |
+|---|---|
+| Receiver picks up the transmitter | Pass: receiver `carrier: 1`, quality 1.0, before anything was wired. |
+| Jukebox → microphone → wire → transmitter → receiver | Pass: `music_disc.cat` played at the receiver's position. Without the mic wire nothing was sent: the transmitter's "built-in mic" is for voice chat only; only a wired Microphone block picks up jukeboxes and game sounds (`RadioNetwork.onWorldSound`, `SoundCapture.pollJukeboxes`). |
+| Receiver on 100.0 (set with `/data merge`, not the tuning table) | Pass: `carrier: 0`, nothing at the receiver. Back on 98.1: carrier and sound return. |
+| Receiver → wire → speaker | Pass: speaker `on: 1`, sound moves to the speaker's position. |
+| Tape player: load tape, press Record in its screen, Stop | Pass: tape holds 226 ticks (~11 s) with the disc's start/stop cues. |
+| Tape playback (Play button) | Pass: plays from the tape player. |
+| Tape player → wire → transmitter, started by a redstone pulse | Pass: plays at the tape player and over the air at the speaker. |
+
+Found along the way:
+- **Possible bug:** the transmitter's `on_air` block state stayed `false` the whole time it was broadcasting jukebox audio. It is only set by `TransmitterBE.onAir()`, which the sound-broadcast path does not seem to call. Check before Phase 1.
+- The tape player screen draws its buttons by hand (no widgets), so an agent has to click by coordinates: GUI 427×240, panel at left 113, top 3; Play (176, 133), Record (212, 133).
+- Wiring needs a clear line of sight to the block; a tuft of grass and an antenna both swallowed clicks.
+- Inserting the disc with `/item replace` and placing blocks with `/setblock` were shortcuts; the wires, tape and screen buttons were done as the player.
+
+##### Static over distance
+The creative transmitter and receiver can't show static: the creative transmitter has unlimited range, and the creative receiver always reports quality 1.0 when it has a carrier. So this used regular blocks:
+- **Transmitter** at (42, 70, −14), facing south, amethyst block in the chamber, copper block behind it at (42, 70, −15), 4 antennas on the copper, and a Create creative motor at (43, 70, −14) on its side shaft (16 RPM). It reported `active`, antenna 4, **range 862.5 blocks**. Tuned to 101.0 FM so the creative transmitter on 98.1 stays out of it. Its chunk is still force-loaded (`/forceload remove 42 -15` to undo).
+- **Receiver**: a regular receiver with an amethyst block and one antenna on top, tuned to 101.0, copied with `/clone` to points due east of the transmitter at y 100 (in the air, to clear hills). "Quality" is the receiver's `q`: 1.0 is clean, lower means more static, 0 means no carrier.
+
+| Distance (blocks) | Quality |
+|---|---|
+| 3 | 0.90 |
+| 50 | 0.90 |
+| 150 | 0.56 (0.83 at y 140) |
+| 300 | 0.27 |
+| 500 | 0.89 |
+| 700 | 0.86 |
+| 850 | 0.82 |
+| 1000 | 0.76 |
+| 1300 | 0.43 |
+| 1600 | 0.21 |
+| 2000 | 0 (no carrier) |
+
+- Pass: quality falls with distance and the signal is gone by 2,000 blocks. The far points fit the mod's formula, `q = (1 − (d / R)^3.2) × 0.902`, with an effective range R ≈ 1,735 blocks (the transmitter's 862.5 × about 2 from the receiver's antenna and crystal gain).
+- **Quirk, worth a look in Phase 1:** the dips at 150 and 300 blocks come from the terrain check (`RadioNetwork.terrain`), which only samples chunks that are loaded. So the same two blocks can get very different reception depending on which chunks happen to be loaded; here the 500-block point read better than the 150- and 300-block points.
+- Not checked: hearing the static. These are server-side numbers; the client's static mix was not listened to.
+- **Shortcut side effect:** changing the regular transmitter's frequency with `/data merge` knocked it off its Create shaft (`Speed: 0`, "needs power") until the motor was placed again. A redstone standby on and off did not do this, so it's the command, not the mod. Tune powered machines in game, not with `/data merge`.
+
+##### Jammer
+Jammer at (38, 70, −16) facing south, about 5 blocks from the regular transmitter–receiver pair (101.0 FM, baseline quality 0.90), with its own creative motor at (37, 70, −16) and a redstone block on top. The code says a running jammer multiplies the quality of any link whose line passes within 48 blocks of it by `0.08 + 0.92 × (d / 48)^1.5`.
+
+| Jammer state | Running | Receiver quality |
+|---|---|---|
+| Motor only | no | 0.90 |
+| Motor + redstone | yes | **0.094** (formula predicts 0.096) |
+| Redstone, no motor | no | 0.90 |
+| Motor, redstone removed | no | 0.90 |
+
+Pass: it needs both rotation and redstone, and the cut matches the formula.
+
+##### Relay tower
+- A Relay Tower (small) placed from its item at (1242, 97, −14), about 1,200 blocks east of the regular transmitter, on a cleared 13×13 pad. Its drive shaft runs along Z; a creative motor at (1242, 97, −16) drives it at 16 RPM. Tuned to 101.0 with `/data merge` *before* the motor went on, to avoid the shaft problem above.
+- It reported `active`, `relaying`, **range 3,502 blocks** at 16 RPM (the Ponder scene says about 5,600, presumably at full speed).
+- A regular receiver 2,500 blocks east of the transmitter (out of its direct reach): **no carrier** before the relay, **quality 0.93** with the relay running.
+- Redstone directly under the core turns the relay off (`active: 0`), and the far receiver loses the station; removing it brings the station back at 0.93. Pass.
+- Observation: the relayed signal (0.93) is cleaner than what the relay itself should be receiving at 1,200 blocks (about 0.6 by the sweep above), so a relay seems to pass on a clean copy rather than the static it heard. Possibly by design; worth a look in Phase 1.
+- Left in the world: the relay tower and its pad at x ≈ 1,242, plus the regular transmitter, receiver and jammer near the bench. All force-loads were removed afterwards.
+
+##### Screens
+Done as the player through s00d's screen tools; screenshots are in `run/screenshots/`.
+
+**Tuning table** (the one at (33, 68, −5)). Its controls are normal widgets, so `screen.state` lists them (AM, FM, the frequency box, six step buttons, `<<`, `>>`, Spec, Reach).
+- A frequency card in the slot shows its frequency, a signal-strength bar and a spectrum. The spectrum showed both live stations: 98.1 (creative transmitter) and 101.0 (regular transmitter). Pass.
+- `>>` seeks to the next station: 98.10 → 101.00, signal bar 91% (matches the 0.90 quality measured for that transmitter). `<<` seeks back to 98.10. The card keeps the tuning (`airwaves:tuning {freq: 101.0}`). Pass.
+- Right-clicking the creative receiver with the 101.0 card retuned it from 98.1 to 101.0 (`airwaves:tune` sound) and it picked up the regular transmitter; the 98.1 card set it back. Pass.
+- Oddity: a click on the speaker with the card also played the `tune` sound, but the speaker has no frequency of its own (`SpeakerBE` isn't tunable), so nothing changed. Harmless, maybe misleading.
+
+**Circuit workbench** (placed at (37, 68, −7)). The board grid, the 10 blueprints (Radio, RF, Tuner, Amplifier, Audio, Display, Control, Computer, Sensor, Logic), Auto and Clear all draw. These controls are not reported as widgets, so they were clicked by position (GUI 427×240: Radio blueprint (282, 21), Auto (279, 155)).
+- Blank circuit board in its slot, Radio blueprint, Auto: it laid out the 8 parts (coil, 2 capacitors, crystal oscillator, LED, transistor, 2 resistors) and the copper traces, listed the stages (tuned tank, oscillator, transistor amp, indicator) and said "Ready: take your Radio Board". Taking it used up the board and the parts and gave one Radio Board. Pass.
+- 36 Airwaves crafting recipes are in the client's recipe book; no errors in the client log. Pass.
+
+Still open: voice through a real microphone (needs you and a headset), the optional second client, and the optional old world.
 
 #### Results so far (2026-11-09, dev client, LAN world in creative)
 - The companion "Airwave" was summoned through Numen and driven from opencode. It cannot type commands, so the world was switched to creative by hand.

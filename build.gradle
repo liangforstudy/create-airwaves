@@ -64,9 +64,17 @@ dependencies {
     implementation('maven.modrinth:simple-voice-chat:neoforge-1.21.1-2.6.21')
     implementation('mezz.jei:jei-1.21.1-neoforge:19.53.0.425')
 
-    // Test-only: Numen (LLM companion + MCP server) for the dev runs. Downloaded
-    // from CurseForge into libs/, which is gitignored; not part of the built jar.
-    runtimeOnly files('libs/numen-neoforge-1.21.1-0.1.2.jar')
+    // Test-only: s00d/minecraft-mcp 0.6.0 (GitHub release), an MCP endpoint in the client
+    // that can click screen buttons and list played sounds. Downloaded into libs/, which is
+    // gitignored; not part of the built jar. (Replaced Numen on 2026-11-09.)
+    runtimeOnly files('libs/minecraft_mcp-neoforge-0.6.0+1.21.1.jar')
+
+    // Test-only performance mods for the dev client (Modrinth version IDs, NeoForge 1.21.1).
+    runtimeOnly('maven.modrinth:ferrite-core:x7kQWVju')     // 7.0.3
+    runtimeOnly('maven.modrinth:modernfix:ZDZENbHH')        // 5.27.27
+    runtimeOnly('maven.modrinth:spark:v5qtqRQi')            // 1.10.124
+    runtimeOnly('maven.modrinth:immediatelyfast:EJzmEPZV')  // 1.6.15
+    runtimeOnly('maven.modrinth:entityculling:eieYbWYb')    // 1.11.3
 
     // Not referenced directly by Java source, but needed for a development
     // game run matching the reconstructed mod's declared environment.
